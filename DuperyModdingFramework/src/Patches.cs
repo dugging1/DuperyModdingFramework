@@ -155,18 +155,22 @@ class Patches
     static bool setRegion(RegionDataSO _region_settings)
     {
         List<Roles> availableRoles = getRegionDaataSO_availableRoles(_region_settings);
+        if (DuperyModdingFramework.Instance.Config.ClearRegionAvailableRoles)
+            availableRoles.Clear();
+        if (DuperyModdingFramework.Instance.Config.ClearRegionStartingRoles)
+            _region_settings.starting_available_roles.Clear();
         foreach (var kv in RegistryRepo.RoleRegions.KeyValue)
-        {
-            if (kv.Value.Contains(_region_settings.region) || kv.Value.Contains(Regions.NONE))
             {
-                availableRoles.Add((Roles)RegistryRepo.RoleEnumValue.Lookup(kv.Key));
-                if (RegistryRepo.RoleStartingRegions.Lookup(kv.Key).Contains(_region_settings.region)
-                    || RegistryRepo.RoleStartingRegions.Lookup(kv.Key).Contains(Regions.NONE))
+                if (kv.Value.Contains(_region_settings.region) || kv.Value.Contains(Regions.NONE))
                 {
-                    _region_settings.starting_available_roles.Add((Roles)RegistryRepo.RoleEnumValue.Lookup(kv.Key));
+                    availableRoles.Add((Roles)RegistryRepo.RoleEnumValue.Lookup(kv.Key));
+                    if (RegistryRepo.RoleStartingRegions.Lookup(kv.Key).Contains(_region_settings.region)
+                        || RegistryRepo.RoleStartingRegions.Lookup(kv.Key).Contains(Regions.NONE))
+                    {
+                        _region_settings.starting_available_roles.Add((Roles)RegistryRepo.RoleEnumValue.Lookup(kv.Key));
+                    }
                 }
             }
-        }
         return true;
     }
 
