@@ -26,9 +26,16 @@ internal class FrameworkConfig : ConfigHandler
 
 DuperyModdingFramework.config
 
+
 [Gernal]
 
+# The folder (relative to Dupery.exe, or absolute) where the framework should look for mod dlls.
+# The framework also searches sub-directories.
 ModsFolderPath = "Mods"
+
+# The folder (relative to Dupery.exe, or absolute) where the framework should look for/put mod config files.
 ModsConfigFolderPath = "Config"
+
+
 
 */
