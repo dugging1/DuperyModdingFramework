@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>DMF-Common-Library</AssemblyName>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>DMF_Lib</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\libs\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="grglib">
+      <HintPath>..\libs\gildedrunegames.grglib.dll</HintPath>
+    </Reference>
+    <Reference Include="grglocalisation">
+      <HintPath>..\libs\gildedrunegames.grglocalisation.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

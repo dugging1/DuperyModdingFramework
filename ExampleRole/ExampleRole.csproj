@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="UnityEngine.Modules" Version="2022.3.62" IncludeAssets="compile" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\libs\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="grglib">
+      <HintPath>..\libs\gildedrunegames.grglib.dll</HintPath>
+    </Reference>
+    <Reference Include="DMF-Common-Library">
+      <HintPath>..\libs\DMF-Common-Library.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
