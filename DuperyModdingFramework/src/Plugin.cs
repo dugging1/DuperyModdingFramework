@@ -12,10 +12,11 @@ using HarmonyLib;
 
 namespace DuperyModdingFramework;
 
-[BepInPlugin("dgging.DuperyModdingFramework", "Dupery Modding Framework", "0.0.0.1")]
+[BepInPlugin("dgging.DuperyModdingFramework", "Dupery Modding Framework", FrameworkVersion)]
 [BepInProcess("Dupery.exe")]
 public class DuperyModdingFramework : BaseUnityPlugin, PreInitCore, InitCore, PostInitCore
 {
+    public const string FrameworkVersion = "0.0.3";
     internal static new ManualLogSource Logger;
     internal MethodInfo getStateMethod;
     internal new FrameworkConfig Config = new(Path.GetFullPath("."));
@@ -23,7 +24,7 @@ public class DuperyModdingFramework : BaseUnityPlugin, PreInitCore, InitCore, Po
     private void Awake()
     {
         Logger = base.Logger;
-        Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
+        Logger.LogInfo($"Dupery Modding Framework loaded with version: {FrameworkVersion}");
 
 
         patchMethods();

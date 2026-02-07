@@ -145,6 +145,7 @@ class Patches
             CollectionsExtension.removeAll(ret, RoleHelper.isTest);
         }
         DuperyModdingFramework.Logger.LogInfo($"Reduced role list has length: {ret.Count}");
+        __result = ret;
         return false;
     }
 
