@@ -13,7 +13,7 @@ using HarmonyLib;
 
 namespace DuperyModdingFramework;
 
-[BepInPlugin("dgging.DuperyModdingFramework", "Dupery Modding Framework", "0.0.0.1")]
+[BepInPlugin("dgging.DuperyModdingFramework", "Dupery Modding Framework", "0.0.2")]
 [BepInProcess("Dupery.exe")]
 public class DuperyModdingFramework : BaseUnityPlugin, PreInitCore, InitCore, PostInitCore
 {
