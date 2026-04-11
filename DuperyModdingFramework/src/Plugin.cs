@@ -8,9 +8,11 @@ using BepInEx.Logging;
 using DMF_Lib;
 using DMF_Lib.Helpers;
 using DuperyModdingFramework.Internal;
+using GRGLib.Maybe;
 using HarmonyLib;
 
 namespace DuperyModdingFramework;
+
 
 [BepInPlugin("dgging.DuperyModdingFramework", "Dupery Modding Framework", FrameworkVersion)]
 [BepInProcess("Dupery.exe")]
@@ -20,9 +22,15 @@ public class DuperyModdingFramework : BaseUnityPlugin, PreInitCore, InitCore, Po
     internal static new ManualLogSource Logger;
     internal MethodInfo getStateMethod;
     internal new FrameworkConfig Config = new(Path.GetFullPath("."));
+    private static DuperyModdingFramework instance = null;
+    public static DuperyModdingFramework Instance { get => instance; }
 
     private void Awake()
     {
+        if (instance is not null)
+            throw new Exception("Two instance of DMF?");
+        instance = this;
+
         Logger = base.Logger;
         Logger.LogInfo($"Dupery Modding Framework loaded with version: {FrameworkVersion}");
 
@@ -38,6 +46,20 @@ public class DuperyModdingFramework : BaseUnityPlugin, PreInitCore, InitCore, Po
     private void patchMethods()
     {
         Harmony.CreateAndPatchAll(typeof(Patches));
+    }
+
+    private void RegisterVanillaRoles()
+    {
+        foreach (var r in (Roles[])Enum.GetValues(typeof(Roles)))
+        {
+            var empty = r.createEmptyRole();
+            var builder = new VanillaRoleBuilder(r);
+            RegisterRole(new("Base", empty.name), new RoleMetaData(
+                new Maybe<ID>(),
+                r.getClassificationFromRoleType(),
+                builder
+            ));
+        }
     }
 
     private void getStateCallback()
@@ -141,8 +163,8 @@ public class DuperyModdingFramework : BaseUnityPlugin, PreInitCore, InitCore, Po
     public Roles RegisterRole(ID ID, RoleMetaData Role)
     {
         RegistryRepo.RoleData.Register(ID, Role);
-        RegistryRepo.RoleRegions.Register(ID, new());
-        RegistryRepo.RoleStartingRegions.Register(ID, new());
+        RegistryRepo.RoleRegions.Register(ID, []);
+        RegistryRepo.RoleStartingRegions.Register(ID, []);
         int RoleVal = RegistryRepo.NextRoleEnumValue;
         RegistryRepo.NextRoleEnumValue++;
         RegistryRepo.RoleEnumValue.Register(ID, RoleVal);
@@ -254,7 +276,7 @@ public class DuperyModdingFramework : BaseUnityPlugin, PreInitCore, InitCore, Po
 
     static List<IDuperyPlugin> SortByDependencies(IEnumerable<IDuperyPlugin> plugins)
         => TopologicalSort([.. plugins], [.. GetPluginDependencyEdges(plugins)], new DependencySorter());
-    
+
     static IEnumerable<Tuple<IDuperyPlugin, IDuperyPlugin>> GetPluginDependencyEdges(IEnumerable<IDuperyPlugin> plugins)
     {
         foreach (var p in plugins)
@@ -327,6 +349,20 @@ public class DuperyModdingFramework : BaseUnityPlugin, PreInitCore, InitCore, Po
         }
     }
 
+    public HashSet<Regions> getRegionAvailable(ID ID)
+        => RegistryRepo.RoleRegions.Lookup(ID);
+
+    public HashSet<Regions> getRegionStarting(ID ID)
+        => RegistryRepo.RoleStartingRegions.Lookup(ID);
+
+    public RoleMetaData GetRoleMetaData(ID ID)
+        => RegistryRepo.RoleData.Lookup(ID);
+
+    public void AlterRoleMetaData(ID ID, Func<RoleMetaData, RoleMetaData> Change)
+    {
+        RegistryRepo.RoleData.Update(ID, Change(RegistryRepo.RoleData.Lookup(ID)));
+    }
+
     internal class DependencySorter : IEqualityComparer<IDuperyPlugin>
     {
         public bool Equals(IDuperyPlugin x, IDuperyPlugin y)
@@ -334,5 +370,25 @@ public class DuperyModdingFramework : BaseUnityPlugin, PreInitCore, InitCore, Po
 
         public int GetHashCode(IDuperyPlugin obj)
             => obj.GetHashCode();
+    }
+
+    private class VanillaRoleBuilder : IRoleDataFactory
+    {
+        protected Roles Role;
+
+        public VanillaRoleBuilder(Roles r)
+        {
+            if (!((Roles[])Enum.GetValues(typeof(Roles))).ToHashSet().Contains(r))
+            {
+                throw new ArgumentException($"Tried to create a vanilla data factory for a non-vanilla role: {r}");
+            }
+            Role = r;
+        }
+
+        public RoleData CreateEmpty()
+            => Role.createEmptyRole();
+
+        public RoleData CreateSetRole(int address, (int, int) boardPos, Random rand, Maybe<RoleData> _true_self)
+            => Role.createRole(address, new UnityEngine.Vector2Int(boardPos.Item1, boardPos.Item2), rand, _true_self);
     }
 }

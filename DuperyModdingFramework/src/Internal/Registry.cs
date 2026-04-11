@@ -30,6 +30,10 @@ public class Registry<T> : IRegistry<T>
 
     public IEnumerable<KeyValuePair<ID, T>> KeyValue => data.AsEnumerable();
 
+    public void Update(ID ID, T Val)
+    {
+        data[ID] = Val;
+    }
 }
 
 public class IntRegistry : IBiRegistry<int>

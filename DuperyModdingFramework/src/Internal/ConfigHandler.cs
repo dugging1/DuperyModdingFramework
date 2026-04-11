@@ -20,7 +20,16 @@ internal class ConfigHandler : IConfigHandler
         configFilePath = Path.Combine(BasePath, configFileName);
         if (File.Exists(configFilePath))
         {
-            config = Toml.ToModel(configFilePath);
+            try
+            {
+                config = Toml.ToModel(File.ReadAllText(configFilePath));
+            }
+            catch (Exception e)
+            {
+                
+                DuperyModdingFramework.Logger.LogError($"An error occured when loading the framework config file:\n {e}");
+                config = new();
+            }
         }
         else
         {

@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace DMF_Lib;
 
 public interface PreInitCore
@@ -74,4 +77,33 @@ public interface PostInitCore
     /// <param name="ID">The ID of the desired plugin.</param>
     /// <returns>The plugin instance.</returns>
     IDuperyPlugin getPluginCore(ID ID);
+
+    /// <summary>
+    /// Gets the set of regions where a given role can appear.
+    /// Regions.NONE represents all regions.
+    /// </summary>
+    /// <param name="ID">The ID of the role to get the region data for.</param>
+    /// <returns>The set of regions where the role can appear.</returns>
+    HashSet<Regions> getRegionAvailable(ID ID);
+
+    /// <summary>
+    /// Gets the set of regions where a given role is a starting role.
+    /// Regions.NONE represents all regions.
+    /// </summary>
+    /// <param name="ID">The ID of the role to get the region data for.</param>
+    /// <returns>The set of regions where the role is a starting role.</returns>
+    HashSet<Regions> getRegionStarting(ID ID);
+
+    /// <summary>
+    /// Gets the meta data associated with a given role.
+    /// </summary>
+    /// <param name="ID">The ID of the role to get the meta data for.</param>
+    RoleMetaData GetRoleMetaData(ID ID);
+
+    /// <summary>
+    /// Allows for a role's metadata to be changed/updated. 
+    /// </summary>
+    /// <param name="ID">The ID of the role to change.</param>
+    /// <param name="Change">A function that changes to metadata.</param>
+    void AlterRoleMetaData(ID ID, Func<RoleMetaData, RoleMetaData> Change);
 }
