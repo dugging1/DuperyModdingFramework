@@ -108,21 +108,21 @@ class Patches
         => isModdedRole(ref __result, _role,
             id => false);
 
-    // [HarmonyPatch(typeof(RoleVisualDataSO), "Item", MethodType.Getter, [typeof(Roles)])]
-    // [HarmonyPrefix]
-    // static bool get_Item(ref Sprite __result, Roles _role)
-    // {
-    //     if ((int)_role >= Enum.GetValues(typeof(Roles)).Length && (int)_role < 10000)
-    //     {
-    //         ID id = RegistryRepo.RoleEnumValue.ReverseLookup((int)_role);
-    //         if (RegistryRepo.RoleData.Lookup(id).SpriteID.is_some)
-    //         {
-    //             __result = RegistryRepo.Sprites.Lookup(RegistryRepo.RoleData.Lookup(id).SpriteID.value);
-    //             return false;
-    //         }
-    //     }
-    //     return true;
-    // }
+    [HarmonyPatch(typeof(RoleVisualDataSO), "getRoleIconSprite")]
+    [HarmonyPrefix]
+    static bool getRoleIconSprite(ref Sprite __result, Roles _role)
+    {
+        if ((int)_role >= Enum.GetValues(typeof(Roles)).Length && (int)_role < 10000)
+        {
+            ID id = RegistryRepo.RoleEnumValue.ReverseLookup((int)_role);
+            if (RegistryRepo.RoleData.Lookup(id).SpriteID.is_some)
+            {
+                __result = RegistryRepo.Sprites.Lookup(RegistryRepo.RoleData.Lookup(id).SpriteID.value);
+                return false;
+            }
+        }
+        return true;
+    }
 
     [HarmonyPatch(typeof(RoleHelper), nameof(RoleHelper.getRoleList), [typeof(Func<Roles, bool>), typeof(bool)])]
     [HarmonyPrefix]
@@ -145,6 +145,7 @@ class Patches
             CollectionsExtension.removeAll(ret, RoleHelper.isTest);
         }
         DuperyModdingFramework.Logger.LogInfo($"Reduced role list has length: {ret.Count}");
+        __result = ret;
         return false;
     }
 
