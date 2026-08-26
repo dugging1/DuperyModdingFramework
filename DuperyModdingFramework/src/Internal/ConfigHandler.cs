@@ -26,7 +26,6 @@ internal class ConfigHandler : IConfigHandler
             }
             catch (Exception e)
             {
-                
                 DuperyModdingFramework.Logger.LogError($"An error occured when loading the framework config file:\n {e}");
                 config = new();
             }

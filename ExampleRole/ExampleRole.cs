@@ -28,7 +28,7 @@ public class ExampleRole : RoleData
 
     public override string english_description => "An example modded role.";
 
-    public override List<KeywordInfo> keywords_used { get; } = new List<KeywordInfo>();
+    // public override List<KeywordInfo> keywords_used { get; } = new List<KeywordInfo>();
 
     public override bool hasInfo => false;
 
@@ -55,7 +55,9 @@ public class ExampleRole : RoleData
     // Has the same generation constraints as the Priest role.
     public override RoleGenerationConstraints getGenerationConstraints()
     {
-        return new RoleGenerationConstraints(RoleGenerationMarkers.SELF_CONFIRM, new RoleTypeGenerationConstraint(ConstraintTypes.ALWAYS_AVOID, RoleGenerationMarkers.SELF_CONFIRM, DisguiseConstraintType.ALWAYS_IGNORE));
+        return new RoleGenerationConstraints(
+            RoleGenerationMarkers.SELF_CONFIRM
+        );
     }
 }
 

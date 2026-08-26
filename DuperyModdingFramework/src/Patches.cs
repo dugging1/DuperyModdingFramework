@@ -52,31 +52,31 @@ class Patches
     [HarmonyPrefix]
     static bool isClockRole(ref bool __result, Roles _role)
         => isModdedRole(ref __result, _role,
-            id => RegistryRepo.RoleRegions.Lookup(id).Contains(Regions.CLOCK)
-                || RegistryRepo.RoleRegions.Lookup(id).Contains(Regions.NONE)
+            id => RegistryRepo.RoleRegionData.Lookup(id).RegionAvailable.Contains(BaseGameIDs.RegionClock)// RegistryRepo.RoleRegions.Lookup(id).Contains(Regions.CLOCK)
+                || RegistryRepo.RoleRegionData.Lookup(id).IsGeneric// RegistryRepo.RoleRegions.Lookup(id).Contains(Regions.NONE)
             );
 
     [HarmonyPatch(typeof(RoleHelper), "isDocksRole")]
     [HarmonyPrefix]
     static bool isDocksRole(ref bool __result, Roles _role)
         => isModdedRole(ref __result, _role,
-            id => RegistryRepo.RoleRegions.Lookup(id).Contains(Regions.DOCKS)
-                || RegistryRepo.RoleRegions.Lookup(id).Contains(Regions.NONE)
+            id => RegistryRepo.RoleRegionData.Lookup(id).RegionAvailable.Contains(BaseGameIDs.RegionDocks)
+                || RegistryRepo.RoleRegionData.Lookup(id).IsGeneric
         );
 
     [HarmonyPatch(typeof(RoleHelper), "isCasinoRole")]
     [HarmonyPrefix]
     static bool isCasinoRole(ref bool __result, Roles _role)
         => isModdedRole(ref __result, _role,
-            id => RegistryRepo.RoleRegions.Lookup(id).Contains(Regions.CASINO)
-                || RegistryRepo.RoleRegions.Lookup(id).Contains(Regions.NONE)
+            id => RegistryRepo.RoleRegionData.Lookup(id).RegionAvailable.Contains(BaseGameIDs.RegionCasino)
+                || RegistryRepo.RoleRegionData.Lookup(id).IsGeneric
         );
 
     [HarmonyPatch(typeof(RoleHelper), "isGenericRole")]
     [HarmonyPrefix]
     static bool isGenericRole(ref bool __result, Roles _role)
         => isModdedRole(ref __result, _role,
-            id => RegistryRepo.RoleRegions.Lookup(id).Contains(Regions.NONE));
+            id => RegistryRepo.RoleRegionData.Lookup(id).IsGeneric);
 
     [HarmonyPatch(typeof(RoleHelper), "isInnocent")]
     [HarmonyPrefix]
@@ -150,35 +150,37 @@ class Patches
     }
 
 
-    [HarmonyPatch(typeof(GameState), nameof(GameState.setRegion))]
-    [HarmonyPrefix]
-    static bool setRegion(RegionDataSO _region_settings)
-    {
-        List<Roles> availableRoles = getRegionDaataSO_availableRoles(_region_settings);
-        if (DuperyModdingFramework.Instance.Config.ClearRegionAvailableRoles)
-            availableRoles.Clear();
-        if (DuperyModdingFramework.Instance.Config.ClearRegionStartingRoles)
-            _region_settings.starting_available_roles.Clear();
-        foreach (var kv in RegistryRepo.RoleRegions.KeyValue)
-            {
-                if (kv.Value.Contains(_region_settings.region) || kv.Value.Contains(Regions.NONE))
-                {
-                    availableRoles.Add((Roles)RegistryRepo.RoleEnumValue.Lookup(kv.Key));
-                    if (RegistryRepo.RoleStartingRegions.Lookup(kv.Key).Contains(_region_settings.region)
-                        || RegistryRepo.RoleStartingRegions.Lookup(kv.Key).Contains(Regions.NONE))
-                    {
-                        _region_settings.starting_available_roles.Add((Roles)RegistryRepo.RoleEnumValue.Lookup(kv.Key));
-                    }
-                }
-            }
-        return true;
-    }
+    // Gamestate no longer works with RegionSO objects. Should be translated to leads.
 
-    static List<Roles> getRegionDaataSO_availableRoles(RegionDataSO rd)
-    {
-        return (List<Roles>)typeof(RegionDataSO).GetField("allowed_roles",
-            System.Reflection.BindingFlags.NonPublic
-            | System.Reflection.BindingFlags.Instance).GetValue(rd);
-    }
+    // [HarmonyPatch(typeof(GameState), nameof(GameState.setRegion))]
+    // [HarmonyPrefix]
+    // static bool setRegion(RegionDataSO _region_settings)
+    // {
+    //     List<Roles> availableRoles = getRegionDataSO_availableRoles(_region_settings);
+    //     if (DuperyModdingFramework.Instance.Config.ClearRegionAvailableRoles)
+    //         availableRoles.Clear();
+    //     if (DuperyModdingFramework.Instance.Config.ClearRegionStartingRoles)
+    //         _region_settings.starting_available_roles.Clear();
+    //     foreach (var kv in RegistryRepo.RoleRegions.KeyValue)
+    //         {
+    //             if (kv.Value.Contains(_region_settings.region) || kv.Value.Contains(Regions.NONE))
+    //             {
+    //                 availableRoles.Add((Roles)RegistryRepo.RoleEnumValue.Lookup(kv.Key));
+    //                 if (RegistryRepo.RoleStartingRegions.Lookup(kv.Key).Contains(_region_settings.region)
+    //                     || RegistryRepo.RoleStartingRegions.Lookup(kv.Key).Contains(Regions.NONE))
+    //                 {
+    //                     _region_settings.starting_available_roles.Add((Roles)RegistryRepo.RoleEnumValue.Lookup(kv.Key));
+    //                 }
+    //             }
+    //         }
+    //     return true;
+    // }
+
+    // static List<Roles> getRegionDataSO_availableRoles(RegionDataSO rd)
+    // {
+    //     return (List<Roles>)typeof(RegionDataSO).GetField("allowed_roles",
+    //         System.Reflection.BindingFlags.NonPublic
+    //         | System.Reflection.BindingFlags.Instance).GetValue(rd);
+    // }
 
 }

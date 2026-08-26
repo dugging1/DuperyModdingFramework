@@ -4,10 +4,9 @@ using DMF_Lib;
 namespace ExamplePlugin;
 
 
-
 public class ExamplePlugin : IDuperyPlugin
 {
-    public ID PluginID { get; } = new ID("dugging", "ExamplePlugin"); 
+    public ID PluginID { get; } = new ID("dugging", "ExamplePlugin");
 
     public Version PluginVersion { get; } = new Version(1, 0, 0);
 

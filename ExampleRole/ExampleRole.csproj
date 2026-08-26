@@ -20,4 +20,8 @@
       <HintPath>..\libs\DMF-Common-Library.dll</HintPath>
     </Reference>
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DuperyCommonLibrary\DuperyCommonLibrary.csproj" />
+  </ItemGroup>
 </Project>

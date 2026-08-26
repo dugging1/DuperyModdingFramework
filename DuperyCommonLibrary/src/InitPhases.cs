@@ -64,7 +64,7 @@ public interface InitCore
     /// <param name="ID">The ID of the role to register.</param>
     /// <param name="Region">The region to register the role to.</param>
     /// <param name="startingRole">Whether the role should be available for generation from the start.</param>
-    void RegisterRoleInRegion(ID ID, Regions Region, bool startingRole = false);
+    void RegisterRoleInRegion(ID ID, ID Region, bool startingRole = false);
 }
 
 public interface PostInitCore
@@ -84,7 +84,7 @@ public interface PostInitCore
     /// </summary>
     /// <param name="ID">The ID of the role to get the region data for.</param>
     /// <returns>The set of regions where the role can appear.</returns>
-    HashSet<Regions> getRegionAvailable(ID ID);
+    HashSet<ID> getRegionAvailable(ID ID);
 
     /// <summary>
     /// Gets the set of regions where a given role is a starting role.
@@ -92,7 +92,7 @@ public interface PostInitCore
     /// </summary>
     /// <param name="ID">The ID of the role to get the region data for.</param>
     /// <returns>The set of regions where the role is a starting role.</returns>
-    HashSet<Regions> getRegionStarting(ID ID);
+    HashSet<ID> getRegionStarting(ID ID);
 
     /// <summary>
     /// Gets the meta data associated with a given role.

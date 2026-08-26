@@ -20,10 +20,11 @@ public class DuperyModdingFramework : BaseUnityPlugin, PreInitCore, InitCore, Po
 {
     public const string FrameworkVersion = "0.0.3";
     internal static new ManualLogSource Logger;
-    internal MethodInfo getStateMethod;
     internal new FrameworkConfig Config = new(Path.GetFullPath("."));
     private static DuperyModdingFramework instance = null;
     public static DuperyModdingFramework Instance { get => instance; }
+
+    public static GameState GameState { get => GameHandler.State; }
 
     private void Awake()
     {
@@ -38,7 +39,6 @@ public class DuperyModdingFramework : BaseUnityPlugin, PreInitCore, InitCore, Po
         patchMethods();
 
         //SceneManager.sceneLoaded += OnSceneLoaded;
-        getStateCallback();
 
         LoadPlugins();
     }
@@ -61,18 +61,6 @@ public class DuperyModdingFramework : BaseUnityPlugin, PreInitCore, InitCore, Po
             ));
         }
     }
-
-    private void getStateCallback()
-    {
-        getStateMethod = typeof(GameHandler).GetMembers()
-                .Where(mem =>
-                    mem is MethodInfo me && me.Name.Contains("get") &&
-                    me.ReturnType.Equals(typeof(GameState)))
-                .Select(mem => mem as MethodInfo)
-                .First();
-    }
-
-    public GameState getState() => (GameState)getStateMethod.Invoke(null, null);
 
     // void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     // {
@@ -163,8 +151,7 @@ public class DuperyModdingFramework : BaseUnityPlugin, PreInitCore, InitCore, Po
     public Roles RegisterRole(ID ID, RoleMetaData Role)
     {
         RegistryRepo.RoleData.Register(ID, Role);
-        RegistryRepo.RoleRegions.Register(ID, []);
-        RegistryRepo.RoleStartingRegions.Register(ID, []);
+        RegistryRepo.RoleRegionData.Register(ID, new RoleRegionData());
         int RoleVal = RegistryRepo.NextRoleEnumValue;
         RegistryRepo.NextRoleEnumValue++;
         RegistryRepo.RoleEnumValue.Register(ID, RoleVal);
@@ -174,16 +161,16 @@ public class DuperyModdingFramework : BaseUnityPlugin, PreInitCore, InitCore, Po
 
     public void RegisterRoleInRegion(ID ID, bool starting_available_roles = false)
     {
-        RegistryRepo.RoleRegions.Lookup(ID).Add(Regions.NONE);
+        RegistryRepo.RoleRegionData.Lookup(ID).IsGeneric = true;
         if (starting_available_roles)
-            RegistryRepo.RoleStartingRegions.Lookup(ID).Add(Regions.NONE);
+            RegistryRepo.RoleRegionData.Lookup(ID).IsGenericStarting = true;
     }
 
-    public void RegisterRoleInRegion(ID ID, Regions Region, bool starting_available_roles = false)
+    public void RegisterRoleInRegion(ID ID, ID Region, bool starting_available_roles = false)
     {
-        RegistryRepo.RoleRegions.Lookup(ID).Add(Region);
+        RegistryRepo.RoleRegionData.Lookup(ID).RegionAvailable.Add(Region);
         if (starting_available_roles)
-            RegistryRepo.RoleStartingRegions.Lookup(ID).Add(Region);
+            RegistryRepo.RoleRegionData.Lookup(ID).RegionStartingAvailable.Add(Region);
     }
 
     public IConfigHandler RegisterConfigFile(ID ID)
@@ -204,7 +191,7 @@ public class DuperyModdingFramework : BaseUnityPlugin, PreInitCore, InitCore, Po
             throw new Exception("Plugin is missing dependencies.");
         }
         Logger.LogInfo($"Loaded {plugins.Count()} with all dependencies satisfied.");
-        if (plugins.Count() == 0)
+        if (!plugins.Any())
         {
             Logger.LogInfo("No plugins loaded. Ending initialisation process.");
             return;
@@ -349,11 +336,11 @@ public class DuperyModdingFramework : BaseUnityPlugin, PreInitCore, InitCore, Po
         }
     }
 
-    public HashSet<Regions> getRegionAvailable(ID ID)
-        => RegistryRepo.RoleRegions.Lookup(ID);
+    public HashSet<ID> getRegionAvailable(ID ID)
+        => RegistryRepo.RoleRegionData.Lookup(ID).RegionAvailable;
 
-    public HashSet<Regions> getRegionStarting(ID ID)
-        => RegistryRepo.RoleStartingRegions.Lookup(ID);
+    public HashSet<ID> getRegionStarting(ID ID)
+        => RegistryRepo.RoleRegionData.Lookup(ID).RegionStartingAvailable;
 
     public RoleMetaData GetRoleMetaData(ID ID)
         => RegistryRepo.RoleData.Lookup(ID);
